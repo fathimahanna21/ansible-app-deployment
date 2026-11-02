@@ -1,0 +1,12 @@
+{
+  "name": "ansible-node-app",
+  "version": "1.0.0",
+  "description": "Node.js application deployed using Jenkins and Ansible",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

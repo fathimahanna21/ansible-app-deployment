@@ -1,0 +1,15 @@
+[Unit]
+Description=Flask Application
+After=network.target
+
+[Service]
+User={{ ansible_user }}
+Group={{ ansible_user }}
+WorkingDirectory=/opt/flask-app
+Environment="PATH=/opt/flask-app/venv/bin"
+ExecStart=/opt/flask-app/venv/bin/gunicorn --workers 2 --bind 127.0.0.1:5000 app:app
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,47 @@
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Check Ansible') {
+            steps {
+                sh 'ansible --version'
+            }
+        }
+
+        stage('Validate Flask Playbook') {
+            steps {
+                sh 'ansible-playbook playbooks/deploy-flask.yml --syntax-check'
+            }
+        }
+
+        stage('Deploy Flask') {
+            steps {
+                withCredentials([
+                    string(
+                        credentialsId: 'ubuntu-sudo-password',
+                        variable: 'ANSIBLE_BECOME_PASS'
+                    )
+                ]) {
+                    sh '''
+                        set +x
+                        PASS_FILE=$(mktemp)
+                        trap 'rm -f "$PASS_FILE"' EXIT
+
+                        printf '%s' "$ANSIBLE_BECOME_PASS" > "$PASS_FILE"
+                        chmod 600 "$PASS_FILE"
+
+                        ansible-playbook playbooks/deploy-flask.yml \
+                            --become-password-file "$PASS_FILE"
+                    '''
+                }
+            }
+        }
+    }
+}
